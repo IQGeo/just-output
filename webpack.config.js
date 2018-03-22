@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -22,6 +23,11 @@ module.exports = {
       { test: /underscore/, loader: 'expose-loader?_' }
     ]
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+        "_": "underscore"
+    })
+  ],
   node: {
     fs: 'empty'
   }
