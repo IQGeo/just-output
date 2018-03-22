@@ -16,7 +16,8 @@
   "author": "Luis Camacho",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1"
+    "bluebird": "^3.5.1",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",

@@ -1,6 +1,7 @@
 
 const testsEnv = (typeof window == 'undefined') ? require('./nodeEnv') : require('./browserEnv');
 const diff = require('./diff');
+const _ = require('underscore');
 
 const tests = [];
 let currentSuite;
