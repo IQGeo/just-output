@@ -53,7 +53,7 @@ function section(name, test) {
 function subTest(name, test) {
     currentTest.subTests.push(function () {
         output('\n***', name);
-        return Promise.resolve(test())
+        return Promise.resolve().then(test)
         .catch(_handleUnexpectedRejection);
     });
 }
@@ -81,7 +81,7 @@ function runTests( filter, resultsPath ) {
 }
 
 function runTest( testFunc ) {
-    return Promise.resolve( testFunc() )
+    return Promise.resolve().then(testFunc)
         .catch(_handleUnexpectedRejection);
 }
 
