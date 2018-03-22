@@ -18,7 +18,8 @@ module.exports = {
           loader: 'babel-loader'
 
         }
-      }
+      },
+      { test: /underscore/, loader: 'expose-loader?_' }
     ]
   },
   node: {
