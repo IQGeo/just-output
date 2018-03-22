@@ -197,6 +197,11 @@ if (typeof module !== "undefined")
 //   - operation: one of "none", "add", "delete"
 //   - atom: the atom found in either A or B
 // Applying operations from diff sequence you should be able to transform A to B
+
+
+const _ = require('underscore');
+
+
 var diff = function (A, B, equals) {
   // We just compare atoms with default equals operator by default
   if (equals === undefined)
