@@ -1,4 +1,4 @@
-let resultsPath = '_tests/results/';
+let resultsPath = 'results';
 let currentTest;
 
 function startRun(lResultsPath) {
@@ -25,7 +25,7 @@ function getAcceptedResult() {
 }
 
 function getAcceptedResultPath() {
-    return resultsPath + currentTest.filename + '.txt';
+    return resultsPath + '/' + currentTest.filename + '.txt';
 }
 
 

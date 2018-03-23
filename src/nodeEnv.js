@@ -2,7 +2,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const tmpdir = os.tmpdir();
-let resultsPath = '_tests/results/';
+let resultsPath = 'results';
 
 let currentTest;
 
@@ -29,13 +29,13 @@ function getAcceptedResult() {
     try {
         acceptedOutput = fs.readFileSync(acceptedFilePath, 'utf-8');
     } catch (error) {
-        // console.log(error);
+        console.log(error);
     }
     return Promise.resolve(acceptedOutput);
 }
 
 function getAcceptedResultPath() {
-    return resultsPath + currentTest.filename + '.txt';
+    return path.resolve(resultsPath, currentTest.filename+'.txt');
 }
 
 
