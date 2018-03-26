@@ -7,7 +7,7 @@ const Promise = require('bluebird');
 const tests = [];
 let currentSuite;
 let currentTest;
-
+let cancelRun = false;
 /**
  * Declares a test suite
  * @param  {string} name        Name of test suite
@@ -60,10 +60,11 @@ function subTest(name, test) {
 }
 
 function runTests( filter, resultsPath ) {
+    cancelRun = false;
     testsEnv.startRun(resultsPath);
     return Promise.each(tests, function (aTest) {
-        if (filter && !_includeTest(filter, aTest)) return;
-
+        if (cancelRun || (filter && !_includeTest(filter, aTest))) return;
+        
         currentTest = aTest;
         currentTest.output = '';
         currentTest.subTests = [];
@@ -78,12 +79,16 @@ function runTests( filter, resultsPath ) {
             .catch(reason => undefined)
             .then(_compareResultToAccepted)
             .then(testsEnv.handleResult);
-    });
+    })
 }
 
-function runTest( testFunc ) {
+function runTest( testFunc ) {    
     return Promise.resolve().then(testFunc)
         .catch(_handleUnexpectedRejection);
+}
+
+function cancelTests() {
+    cancelRun = true;
 }
 
 function listTests( filter ) {
@@ -204,7 +209,8 @@ const framework = {
     tests,
     output,
     subTest,
-    section
+    section,
+    cancelTests
 };
 Object.assign(global, framework);
 global.jo = framework;
