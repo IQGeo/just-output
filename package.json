@@ -1,6 +1,6 @@
 {
   "name": "just-output",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Test framework based on outputing results and comparing it with the expected result on file",
   "main": "src/main.js",
   "scripts": {
