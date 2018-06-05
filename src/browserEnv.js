@@ -1,7 +1,7 @@
 let resultsPath = 'results';
 let currentTest;
 
-function startRun(lResultsPath) {
+function startRun(lResultsPath, options) {
     if (lResultsPath) resultsPath = lResultsPath;
     //ENH: simplify integration with react app
     justOutputUIRender(true);

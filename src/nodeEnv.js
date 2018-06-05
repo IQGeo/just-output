@@ -1,13 +1,15 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const tmpdir = os.tmpdir();
+let tmpdir = os.tmpdir();
 let resultsPath = 'results';
 
 let currentTest;
 
-function startRun(lResultsPath) {
+function startRun(lResultsPath, options) {
+	console.log('options', options)
     if (lResultsPath) resultsPath = lResultsPath;
+    if (options.tmpdir) tmpdir = options.tmpdir;
 	console.log("Temp directory: ", tmpdir);
 }
 
@@ -17,7 +19,9 @@ function startTest(test) {
 
 
 function writeTmpResult(currentTestOutput) {
+	console.log('writeTmpResult', tmpdir, currentTest.filename+'.txt')
     let resultFilePath = path.join(tmpdir, currentTest.filename+'.txt');
+    console.log('writeTmpResult', resultFilePath)
     fs.writeFileSync(resultFilePath, currentTest.output);
 }
 
@@ -27,7 +31,9 @@ function getAcceptedResult() {
     let acceptedOutput;
 
     try {
+    	console.log('getAcceptedResult')
         acceptedOutput = fs.readFileSync(acceptedFilePath, 'utf-8');
+        console.log(acceptedOutput)
     } catch (error) {
         console.log(error);
     }

@@ -5,6 +5,9 @@ const _ = require('underscore');
 const Promise = require('bluebird');
 
 const tests = [];
+const options = {
+    tmpdir: undefined //default is up to env
+};
 let currentSuite;
 let currentTest;
 let cancelRun = false;
@@ -59,9 +62,14 @@ function subTest(name, test) {
     });
 }
 
+
+function config(newOptions) {
+    Object.assign(options, newOptions)
+}
+
 function runTests( filter, resultsPath ) {
     cancelRun = false;
-    testsEnv.startRun(resultsPath);
+    testsEnv.startRun(resultsPath, options);
     return Promise.each(tests, function (aTest) {
         if (cancelRun || (filter && !_includeTest(filter, aTest))) return;
         
@@ -75,6 +83,7 @@ function runTests( filter, resultsPath ) {
             })
             .catch(_handleUnexpectedRejection)
             .tap(testsEnv.writeTmpResult)
+            .catch(console.log)
             .then(testsEnv.getAcceptedResult)
             .catch(reason => undefined)
             .then(_compareResultToAccepted)
@@ -209,13 +218,15 @@ const framework = {
     tests,
     output,
     subTest,
-    section,
-    cancelTests
+    section
 };
 Object.assign(global, framework);
 global.jo = framework;
 
+//these are not exposed as globals
 module.exports = Object.assign(framework, {
     runTests,
-    listTests
+    listTests,
+    cancelTests,
+    config
 });
