@@ -1,8 +1,6 @@
 
 const testsEnv = (typeof window == 'undefined') ? require('./nodeEnv') : require('./browserEnv');
 const diff = require('./diff');
-const _ = require('underscore');
-const Promise = require('bluebird');
 
 const tests = [];
 const options = {
@@ -39,9 +37,9 @@ function test(name, testFunc) {
     });
 }
 
-function output() {
-    var args = _.map(arguments, function (value) {return (typeof value == 'string') ? value : _stringify(value);} );
-    currentTest.output += args.join(' ');
+function output(...args) {
+    const strArgs = args.map(value => (typeof value == 'string') ? value : _stringify(value));
+    currentTest.output += strArgs.join(' ');
     currentTest.output += '\n';
 }
 
@@ -55,45 +53,61 @@ function section(name, test) {
 }
 
 function subTest(name, test) {
-    currentTest.subTests.push(function () {
+    currentTest.subTests.push(async function () {
         output('\n***', name);
-        return Promise.resolve().then(test)
-        .catch(_handleUnexpectedRejection);
+        try {
+            await test();
+        } catch (e) {
+            _handleUnexpectedRejection(e) ;
+        }
     });
 }
 
 
 function config(newOptions) {
-    Object.assign(options, newOptions)
+    Object.assign(options, newOptions);
 }
 
-function runTests( filter, resultsPath ) {
+async function runTests( filter, resultsPath ) {
     cancelRun = false;
     testsEnv.startRun(resultsPath, options);
-    return Promise.each(tests, function (aTest) {
+    for (const aTest of tests) {
         if (cancelRun || (filter && !_includeTest(filter, aTest))) return;
         
         currentTest = aTest;
         currentTest.output = '';
         currentTest.subTests = [];
         testsEnv.startTest(currentTest);
-        return runTest(currentTest.testFunc)
-            .then(function () {
-                return Promise.each(currentTest.subTests, runTest);
-            })
-            .catch(_handleUnexpectedRejection)
-            .tap(testsEnv.writeTmpResult)
-            .catch(console.log)
-            .then(testsEnv.getAcceptedResult)
-            .catch(reason => undefined)
-            .then(_compareResultToAccepted)
-            .then(testsEnv.handleResult);
-    })
+        try {
+            await runTest(currentTest.testFunc);
+            for (const subTest of currentTest.subTests) {
+                await runTest(subTest);
+            }
+        } catch (e) {
+            _handleUnexpectedRejection(e);
+        }
+        try {
+            await testsEnv.writeTmpResult();
+        } catch (e) {
+            console.log(e);
+        }
+        let expectedResult;
+        try {
+            expectedResult = await testsEnv.getAcceptedResult();
+        } catch (reason) {
+
+        }
+        const comparison = _compareResultToAccepted(expectedResult);
+        testsEnv.handleResult(comparison);
+    }
 }
 
-function runTest( testFunc ) {    
-    return Promise.resolve().then(testFunc)
-        .catch(_handleUnexpectedRejection);
+async function runTest( testFunc ) {    
+    try {
+        await testFunc();
+    } catch (e) {
+        _handleUnexpectedRejection(e) ;
+    }
 }
 
 function cancelTests() {
@@ -136,9 +150,7 @@ function _handleUnexpectedRejection(reason) {
 function _outputErrorStack(error) {
     if (error.stack && error.stack.indexOf("From previous event") >= 0) {
         //include full stack as it will include the line that originated the error
-        _.each(error.stack.split('\n'), function (line) {
-            output(line);
-        }); 
+        error.stack.split('\n').forEach(output); 
     } else {
         //no need to clutter output since it won't include the request's origin
         output("Error: " + error.message);
@@ -157,10 +169,10 @@ function _stringify(obj, indentLvl) {
             pairs.push([k, _stringify(obj[k], indentLvl+1)]);
         }
         pairs.sort(function(a, b) { return a[0] < b[0] ? -1 : 1;});
-        pairs = _.reduce(pairs, function(m, v, i) { return (i?m+',\n':'')+indent+'"' + v[0] + '": ' + v[1];}, '');
+        pairs = pairs.reduce(function(m, v, i) { return (i?m+',\n':'')+indent+'"' + v[0] + '": ' + v[1];}, '');
         return '{\n' + pairs + '\n'+indentClose+'}';
     } else if (type === '[object Array]') {
-        return '[\n' + _.reduce(obj, function(m, v, i) { return (i?m+',\n':'')+indent+_stringify(v, indentLvl+1); }, '') + '\n'+indentClose+']';
+        return '[\n' + obj.reduce(function(m, v, i) { return (i?m+',\n':'')+indent+_stringify(v, indentLvl+1); }, '') + '\n'+indentClose+']';
     } else if (type === '[object Number]') {
         if ((obj.toString().length > 13) || (Math.abs(obj) > 1.0e+12)) {
             return parseFloat( obj.toPrecision(12) ).toString();
@@ -184,7 +196,7 @@ function _compareResultToAccepted(expected) {
     }
 
     var comparison = diff(actual.split(/\r?\n/), expected.split(/\r?\n/));
-    var diffs = _.filter(comparison, function (aDiff) { return (aDiff.operation == "add" || aDiff.operation == "delete"); });                    
+    var diffs = comparison.filter(aDiff => (aDiff.operation == "add" || aDiff.operation == "delete"));
     var result = {
         pass: (diffs.length === 0),
         message: ''
@@ -193,7 +205,7 @@ function _compareResultToAccepted(expected) {
         result.message = "output is equal to accepted output";
     } else {
         var lineDiffs = [];
-        _.each(fullContext ? comparison : diffs, function (aDiff) {
+        (fullContext ? comparison : diffs).forEach((aDiff) => {
             if (aDiff.operation == "add") {
                 lineDiffs.push('-  ' + aDiff.atom);
             } else if (aDiff.operation == "delete") {
