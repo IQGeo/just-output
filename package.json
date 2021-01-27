@@ -1,57 +1,57 @@
 {
-  "name": "just-output",
-  "version": "0.1.0",
-  "description": "Test framework based on outputing results and comparing it with the expected result on file",
-  "main": "src/main.js",
-  "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "integration",
-    "tests",
-    "framework"
-  ],
-  "author": "Luis Camacho",
-  "license": "ISC",
-  "dependencies": {
-    "underscore": "^1.8.3"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.0.0-beta.40",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
-    "@babel/preset-env": "^7.0.0-beta.40",
-    "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-import": "^1.6.6",
-    "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
-    "expose-loader": "^0.7.5",
-    "prettier": "^2.2.1",
-    "style-loader": "^0.20.3",
-    "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.10"
-  },
-  "babel": {
-    "presets": [
-      "react",
-      "stage-0"
+    "name": "just-output",
+    "version": "0.1.2",
+    "description": "Test framework based on outputing results and comparing it with the expected result on file",
+    "main": "src/main.js",
+    "scripts": {
+        "build": "webpack",
+        "watch": "webpack --watch",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "integration",
+        "tests",
+        "framework"
     ],
-    "plugins": [
-      [
-        "import",
-        {
-          "libraryName": "antd",
-          "libraryDirectory": "es",
-          "style": "css"
-        }
-      ]
-    ]
-  },
-  "prettier": {
-    "tabWidth": 4,
-    "singleQuote": true,
-    "printWidth": 100
-  }
+    "author": "Luis Camacho",
+    "license": "ISC",
+    "dependencies": {
+        "underscore": "^1.8.3"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.0.0-beta.40",
+        "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
+        "@babel/preset-env": "^7.0.0-beta.40",
+        "babel-core": "^6.26.0",
+        "babel-loader": "^7.1.4",
+        "babel-plugin-import": "^1.6.6",
+        "babel-preset-react": "6.24.1",
+        "babel-preset-stage-0": "6.24.1",
+        "expose-loader": "^0.7.5",
+        "prettier": "^2.2.1",
+        "style-loader": "^0.20.3",
+        "webpack": "^4.1.1",
+        "webpack-cli": "^2.0.10"
+    },
+    "babel": {
+        "presets": [
+            "react",
+            "stage-0"
+        ],
+        "plugins": [
+            [
+                "import",
+                {
+                    "libraryName": "antd",
+                    "libraryDirectory": "es",
+                    "style": "css"
+                }
+            ]
+        ]
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true,
+        "printWidth": 100
+    }
 }
