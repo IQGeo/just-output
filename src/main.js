@@ -147,13 +147,7 @@ function _handleUnexpectedRejection(reason) {
 }
 
 function _outputErrorStack(error) {
-    if (error.stack && error.stack.indexOf('From previous event') >= 0) {
-        //include full stack as it will include the line that originated the error
-        error.stack.split('\n').forEach(output);
-    } else {
-        //no need to clutter output since it won't include the request's origin
-        output('Error: ' + error.message);
-    }
+    error.stack.split('\n').forEach((line) => output(line));
 }
 
 function _stringify(obj, indentLvl) {
