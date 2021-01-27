@@ -8,37 +8,34 @@ function startRun(lResultsPath, options) {
 }
 
 function startTest(test) {
-	currentTest = test;
+    currentTest = test;
 }
-
 
 function writeTmpResult(currentTestOutput) {
-	//do nothing
-	//ENH: write file via a chrome plugin?
+    //do nothing
+    //ENH: write file via a chrome plugin?
 }
 
-
 function getAcceptedResult() {
-	const acceptedFilePath = getAcceptedResultPath();
-	const url = acceptedFilePath + '?' + Math.random(); //add a random param to the url so that the browser doesn't use cached results
-	return _ajax(url);
+    const acceptedFilePath = getAcceptedResultPath();
+    const url = acceptedFilePath + '?' + Math.random(); //add a random param to the url so that the browser doesn't use cached results
+    return _ajax(url);
 }
 
 function getAcceptedResultPath() {
     return resultsPath + '/' + currentTest.filename + '.txt';
 }
 
-
 function handleResult(result) {
-	window.handleTestResult(result, currentTest);
+    window.handleTestResult(result, currentTest);
 }
 
 function list(test) {
-	console.log('test:', test.filename);
+    console.log('test:', test.filename);
 }
 
 function _ajax(url) {
-	return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         var request = new XMLHttpRequest();
 
         function onload() {
@@ -46,7 +43,7 @@ function _ajax(url) {
                 var result = request.response || request.responseText || request.responseXML;
                 resolve(result);
             } else {
-                var error = new Error("Status code was " + request.status);
+                var error = new Error('Status code was ' + request.status);
                 error.code = request.status;
                 error.responseText = request.responseText;
                 reject(error);
@@ -58,7 +55,7 @@ function _ajax(url) {
         }
 
         try {
-            request.open("GET", url, true);
+            request.open('GET', url, true);
             request.onreadystatechange = function () {
                 if (request.readyState === 4) {
                     onload();
@@ -70,16 +67,15 @@ function _ajax(url) {
         } catch (exception) {
             reject(exception);
         }
-
     });
 }
 
 module.exports = {
-	startRun,
-	startTest,
-	writeTmpResult,
-	getAcceptedResultPath,
-	getAcceptedResult,
-	handleResult,
-	list
+    startRun,
+    startTest,
+    writeTmpResult,
+    getAcceptedResultPath,
+    getAcceptedResult,
+    handleResult,
+    list,
 };

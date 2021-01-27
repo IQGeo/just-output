@@ -28,6 +28,7 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-0": "6.24.1",
     "expose-loader": "^0.7.5",
+    "prettier": "^2.2.1",
     "style-loader": "^0.20.3",
     "webpack": "^4.1.1",
     "webpack-cli": "^2.0.10"
@@ -47,5 +48,10 @@
         }
       ]
     ]
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "singleQuote": true,
+    "printWidth": 100
   }
 }

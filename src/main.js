@@ -1,10 +1,9 @@
-
-const testsEnv = (typeof window == 'undefined') ? require('./nodeEnv') : require('./browserEnv');
+const testsEnv = typeof window == 'undefined' ? require('./nodeEnv') : require('./browserEnv');
 const diff = require('./diff');
 
 const tests = [];
 const options = {
-    tmpdir: undefined //default is up to env
+    tmpdir: undefined, //default is up to env
 };
 let currentSuite;
 let currentTest;
@@ -28,17 +27,17 @@ function suite(name, tests) {
  * @param  {function} testFunc  Function to execute as part of test
  */
 function test(name, testFunc) {
-    const fullName = currentSuite ? currentSuite+'_'+name : name;
+    const fullName = currentSuite ? currentSuite + '_' + name : name;
     tests.push({
-        name: fullName, 
-        testFunc, 
+        name: fullName,
+        testFunc,
         suite: currentSuite,
-        filename: fullName.replace(/[^a-z0-9]/gi, '_')
+        filename: fullName.replace(/[^a-z0-9]/gi, '_'),
     });
 }
 
 function output(...args) {
-    const strArgs = args.map(value => (typeof value == 'string') ? value : _stringify(value));
+    const strArgs = args.map((value) => (typeof value == 'string' ? value : _stringify(value)));
     currentTest.output += strArgs.join(' ');
     currentTest.output += '\n';
 }
@@ -48,7 +47,7 @@ function section(name, test) {
         output('\n***', name);
         test();
     } else {
-        output('\n***', ...arguments);        
+        output('\n***', ...arguments);
     }
 }
 
@@ -58,22 +57,21 @@ function subTest(name, test) {
         try {
             await test();
         } catch (e) {
-            _handleUnexpectedRejection(e) ;
+            _handleUnexpectedRejection(e);
         }
     });
 }
-
 
 function config(newOptions) {
     Object.assign(options, newOptions);
 }
 
-async function runTests( filter, resultsPath ) {
+async function runTests(filter, resultsPath) {
     cancelRun = false;
     testsEnv.startRun(resultsPath, options);
     for (const aTest of tests) {
         if (cancelRun || (filter && !_includeTest(filter, aTest))) return;
-        
+
         currentTest = aTest;
         currentTest.output = '';
         currentTest.subTests = [];
@@ -94,19 +92,17 @@ async function runTests( filter, resultsPath ) {
         let expectedResult;
         try {
             expectedResult = await testsEnv.getAcceptedResult();
-        } catch (reason) {
-
-        }
+        } catch (reason) {}
         const comparison = _compareResultToAccepted(expectedResult);
         testsEnv.handleResult(comparison);
     }
 }
 
-async function runTest( testFunc ) {    
+async function runTest(testFunc) {
     try {
         await testFunc();
     } catch (e) {
-        _handleUnexpectedRejection(e) ;
+        _handleUnexpectedRejection(e);
     }
 }
 
@@ -114,10 +110,9 @@ function cancelTests() {
     cancelRun = true;
 }
 
-function listTests( filter ) {
+function listTests(filter) {
     getTests(filter).forEach(testsEnv.list);
 }
-
 
 function getTests(filter) {
     if (!filter) return tests;
@@ -126,16 +121,20 @@ function getTests(filter) {
 
 var _includeTest = function (filter, test) {
     var testName = test.filename;
-    return (testName.match(filter) != null);
+    return testName.match(filter) != null;
 };
 
 function _handleUnexpectedRejection(reason) {
-    var error = (reason instanceof Error) ? reason : new Error(reason.msg || reason);
+    var error = reason instanceof Error ? reason : new Error(reason.msg || reason);
 
-    if (document && document.location && document.location.search && 
-        document.location.search.indexOf("spec=") >= 0) {
-        //individual test run              
-        if (document.location.search.indexOf("catch=false") >= 0) {
+    if (
+        document &&
+        document.location &&
+        document.location.search &&
+        document.location.search.indexOf('spec=') >= 0
+    ) {
+        //individual test run
+        if (document.location.search.indexOf('catch=false') >= 0) {
             throw error;
         } else {
             console.log(error.stack);
@@ -148,34 +147,46 @@ function _handleUnexpectedRejection(reason) {
 }
 
 function _outputErrorStack(error) {
-    if (error.stack && error.stack.indexOf("From previous event") >= 0) {
+    if (error.stack && error.stack.indexOf('From previous event') >= 0) {
         //include full stack as it will include the line that originated the error
-        error.stack.split('\n').forEach(output); 
+        error.stack.split('\n').forEach(output);
     } else {
         //no need to clutter output since it won't include the request's origin
-        output("Error: " + error.message);
+        output('Error: ' + error.message);
     }
 }
 
 function _stringify(obj, indentLvl) {
     var type = Object.prototype.toString.call(obj);
     indentLvl = indentLvl || 1;
-    var indent = new Array( indentLvl + 1 ).join('\t'), 
-        indentClose = new Array( indentLvl ).join('\t');
+    var indent = new Array(indentLvl + 1).join('\t'),
+        indentClose = new Array(indentLvl).join('\t');
     if (type === '[object Object]') {
         var pairs = [];
         for (var k in obj) {
             if (!obj.hasOwnProperty(k)) continue;
-            pairs.push([k, _stringify(obj[k], indentLvl+1)]);
+            pairs.push([k, _stringify(obj[k], indentLvl + 1)]);
         }
-        pairs.sort(function(a, b) { return a[0] < b[0] ? -1 : 1;});
-        pairs = pairs.reduce(function(m, v, i) { return (i?m+',\n':'')+indent+'"' + v[0] + '": ' + v[1];}, '');
-        return '{\n' + pairs + '\n'+indentClose+'}';
+        pairs.sort(function (a, b) {
+            return a[0] < b[0] ? -1 : 1;
+        });
+        pairs = pairs.reduce(function (m, v, i) {
+            return (i ? m + ',\n' : '') + indent + '"' + v[0] + '": ' + v[1];
+        }, '');
+        return '{\n' + pairs + '\n' + indentClose + '}';
     } else if (type === '[object Array]') {
-        return '[\n' + obj.reduce(function(m, v, i) { return (i?m+',\n':'')+indent+_stringify(v, indentLvl+1); }, '') + '\n'+indentClose+']';
+        return (
+            '[\n' +
+            obj.reduce(function (m, v, i) {
+                return (i ? m + ',\n' : '') + indent + _stringify(v, indentLvl + 1);
+            }, '') +
+            '\n' +
+            indentClose +
+            ']'
+        );
     } else if (type === '[object Number]') {
-        if ((obj.toString().length > 13) || (Math.abs(obj) > 1.0e+12)) {
-            return parseFloat( obj.toPrecision(12) ).toString();
+        if (obj.toString().length > 13 || Math.abs(obj) > 1.0e12) {
+            return parseFloat(obj.toPrecision(12)).toString();
         }
         return obj.toString();
     }
@@ -183,32 +194,32 @@ function _stringify(obj, indentLvl) {
     return JSON.stringify(obj, null, '\t');
 }
 
-
-
 function _compareResultToAccepted(expected) {
     const actual = currentTest.output;
     let fullContext = false;
 
     if (!expected) {
-        var message = 'No accepted output ('+testsEnv.getAcceptedResultPath()+')';
-        if (fullContext) message += '. Output: \n' +actual;
-        return {pass: false, message: message};
+        var message = 'No accepted output (' + testsEnv.getAcceptedResultPath() + ')';
+        if (fullContext) message += '. Output: \n' + actual;
+        return { pass: false, message: message };
     }
 
     var comparison = diff(actual.split(/\r?\n/), expected.split(/\r?\n/));
-    var diffs = comparison.filter(aDiff => (aDiff.operation == "add" || aDiff.operation == "delete"));
+    var diffs = comparison.filter(
+        (aDiff) => aDiff.operation == 'add' || aDiff.operation == 'delete'
+    );
     var result = {
-        pass: (diffs.length === 0),
-        message: ''
+        pass: diffs.length === 0,
+        message: '',
     };
     if (result.pass) {
-        result.message = "output is equal to accepted output";
+        result.message = 'output is equal to accepted output';
     } else {
         var lineDiffs = [];
         (fullContext ? comparison : diffs).forEach((aDiff) => {
-            if (aDiff.operation == "add") {
+            if (aDiff.operation == 'add') {
                 lineDiffs.push('-  ' + aDiff.atom);
-            } else if (aDiff.operation == "delete") {
+            } else if (aDiff.operation == 'delete') {
                 lineDiffs.push('+  ' + aDiff.atom);
             } else if (aDiff.atom) {
                 lineDiffs.push('   ' + aDiff.atom);
@@ -216,7 +227,7 @@ function _compareResultToAccepted(expected) {
                 lineDiffs.push('   ' + aDiff);
             }
         });
-        result.message = "Expected output to match accepted output:\n" + lineDiffs.join('\n');
+        result.message = 'Expected output to match accepted output:\n' + lineDiffs.join('\n');
         result.diffs = diffs;
         result.comparison = comparison;
     }
@@ -230,7 +241,7 @@ const framework = {
     tests,
     output,
     subTest,
-    section
+    section,
 };
 Object.assign(global, framework);
 global.jo = framework;
@@ -240,5 +251,5 @@ module.exports = Object.assign(framework, {
     runTests,
     listTests,
     cancelTests,
-    config
+    config,
 });
