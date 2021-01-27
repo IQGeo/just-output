@@ -70,7 +70,7 @@ async function runTests(filter, resultsPath) {
     cancelRun = false;
     testsEnv.startRun(resultsPath, options);
     for (const aTest of tests) {
-        if (cancelRun || (filter && !_includeTest(filter, aTest))) return;
+        if (cancelRun || (filter && !_includeTest(filter, aTest))) continue;
 
         currentTest = aTest;
         currentTest.output = '';
