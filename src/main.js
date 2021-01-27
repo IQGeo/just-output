@@ -111,7 +111,7 @@ function getTests(filter) {
 }
 
 var _includeTest = function (filter, test) {
-    var testName = test.name;
+    var testName = test.filename;
     return (testName.match(filter) != null);
 };
 
