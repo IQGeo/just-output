@@ -30,7 +30,7 @@ function suite(name, tests) {
  * @param  {function} testFunc  Function to execute as part of test
  */
 function test(name, testFunc) {
-    const fullName = currentSuite ? currentSuite+' '+name : name;
+    const fullName = currentSuite ? currentSuite+'_'+name : name;
     tests.push({
         name: fullName, 
         testFunc, 
