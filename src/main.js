@@ -1,4 +1,3 @@
-const testsEnv = typeof window == 'undefined' ? require('./nodeEnv') : require('./browserEnv');
 const diff = require('./diff');
 
 const tests = [];
@@ -8,6 +7,12 @@ const options = {
 let currentSuite;
 let currentTest;
 let cancelRun = false;
+let testsEnv;
+
+function setTestEnv(env) {
+    testsEnv = env;
+}
+
 /**
  * Declares a test suite
  * @param  {string} name        Name of test suite
@@ -246,4 +251,5 @@ module.exports = Object.assign(framework, {
     listTests,
     cancelTests,
     config,
+    setTestEnv,
 });

@@ -1,3 +1,6 @@
+import { setTestEnv, suite, test, tests, output, subTest, section } from './main';
+export * from './main';
+
 let resultsPath = 'results';
 let currentTest;
 
@@ -11,7 +14,7 @@ function startTest(test) {
     currentTest = test;
 }
 
-function writeTmpResult(currentTestOutput) {
+function writeTmpResult() {
     //do nothing
     //ENH: write file via a chrome plugin?
 }
@@ -70,12 +73,11 @@ function _ajax(url) {
     });
 }
 
-module.exports = {
+setTestEnv({
     startRun,
     startTest,
     writeTmpResult,
-    getAcceptedResultPath,
     getAcceptedResult,
     handleResult,
     list,
-};
+});

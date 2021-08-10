@@ -2,6 +2,11 @@
 
 // Refer to http://www.xmailserver.org/diff2.pdf
 
+const map = (arr, fn) => {
+    if (typeof arr.map == 'function') return arr.map(fn);
+    return [];
+};
+
 // Longest Common Subsequence
 // @param A - sequence of atoms - Array
 // @param B - sequence of atoms - Array
@@ -89,7 +94,7 @@ var LCS = function (A, B, /* optional */ equals) {
                     if (V[k] >= U[k])
                         // Forward D-path can overlap with reversed D-1-path
                         // Found an overlap, the middle snake, convert X-components to dots
-                        overlap = _.map([xx, x], toPoint, k); // XXX ES5
+                        overlap = [xx, x].map((el) => toPoint(el, k));
             }
 
             if (overlap) var SES = D * 2 - 1;
@@ -112,7 +117,7 @@ var LCS = function (A, B, /* optional */ equals) {
                 U[K] = x;
 
                 if (Delta % 2 === 0 && inRange(K, -D, D))
-                    if (U[K] <= V[K]) overlap = _.map([x, xx], toPoint, K); // XXX ES5
+                    if (U[K] <= V[K]) overlap = [xx, x].map((el) => toPoint(el, k));
             }
 
             if (overlap) {
@@ -161,8 +166,8 @@ var inRange = function (x, l, r) {
 
 // Takes X-component as argument, diagonal as context,
 // returns array-pair of form x, y
-var toPoint = function (x) {
-    return [x, x - this]; // XXX context is not the best way to pass diagonal
+var toPoint = function (x, diagonal) {
+    return [x, x - diagonal];
 };
 
 // Wrappers
@@ -183,8 +188,6 @@ if (typeof module !== 'undefined') module.exports = LCS;
 //   - atom: the atom found in either A or B
 // Applying operations from diff sequence you should be able to transform A to B
 
-const _ = require('underscore');
-
 var diff = function (A, B, equals) {
     // We just compare atoms with default equals operator by default
     if (equals === undefined)
@@ -203,7 +206,7 @@ var diff = function (A, B, equals) {
 
     while (i < N && j < M && equals(A[N - 1], B[M - 1])) N--, M--, K++;
 
-    _.map([].push.apply(diff, A.slice(0, i)), function (atom) {
+    map([].push.apply(diff, A.slice(0, i)), function (atom) {
         return { operation: 'none', atom: atom };
     });
 
@@ -218,7 +221,7 @@ var diff = function (A, B, equals) {
         // Delete unmatched atoms from A
         [].push.apply(
             diff,
-            _.map(A.slice(i, ni), function (atom) {
+            map(A.slice(i, ni), function (atom) {
                 return { operation: 'delete', atom: atom };
             })
         );
@@ -226,7 +229,7 @@ var diff = function (A, B, equals) {
         // Add unmatched atoms from B
         [].push.apply(
             diff,
-            _.map(B.slice(j, nj), function (atom) {
+            map(B.slice(j, nj), function (atom) {
                 return { operation: 'add', atom: atom };
             })
         );
@@ -242,21 +245,21 @@ var diff = function (A, B, equals) {
 
     [].push.apply(
         diff,
-        _.map(A.slice(i, N), function (atom) {
+        map(A.slice(i, N), function (atom) {
             return { operation: 'delete', atom: atom };
         })
     );
 
     [].push.apply(
         diff,
-        _.map(B.slice(j, M), function (atom) {
+        map(B.slice(j, M), function (atom) {
             return { operation: 'add', atom: atom };
         })
     );
 
     [].push.apply(
         diff,
-        _.map(A.slice(N, N + K), function (atom) {
+        map(A.slice(N, N + K), function (atom) {
             return { operation: 'none', atom: atom };
         })
     );

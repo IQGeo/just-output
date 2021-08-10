@@ -1,3 +1,8 @@
+const lib = require('./main');
+const { setTestEnv } = lib;
+module.exports = lib;
+
+
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -16,7 +21,7 @@ function startTest(test) {
     currentTest = test;
 }
 
-function writeTmpResult(currentTestOutput) {
+function writeTmpResult() {
     let resultFilePath = path.join(tmpdir, currentTest.filename + '.txt');
     fs.writeFileSync(resultFilePath, currentTest.output);
 }
@@ -50,12 +55,11 @@ function list(test) {
     console.log('test:', test.filename);
 }
 
-module.exports = {
+setTestEnv({
     startRun,
     startTest,
     writeTmpResult,
-    getAcceptedResultPath,
     getAcceptedResult,
     handleResult,
     list,
-};
+});
