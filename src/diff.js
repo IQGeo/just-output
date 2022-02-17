@@ -2,11 +2,6 @@
 
 // Refer to http://www.xmailserver.org/diff2.pdf
 
-const map = (arr, fn) => {
-    if (typeof arr.map == 'function') return arr.map(fn);
-    return [];
-};
-
 // Longest Common Subsequence
 // @param A - sequence of atoms - Array
 // @param B - sequence of atoms - Array
@@ -117,7 +112,7 @@ var LCS = function (A, B, /* optional */ equals) {
                 U[K] = x;
 
                 if (Delta % 2 === 0 && inRange(K, -D, D))
-                    if (U[K] <= V[K]) overlap = [xx, x].map((el) => toPoint(el, k));
+                    if (U[K] <= V[K]) overlap = [x, xx].map((el) => toPoint(el, K));
             }
 
             if (overlap) {
@@ -206,9 +201,7 @@ var diff = function (A, B, equals) {
 
     while (i < N && j < M && equals(A[N - 1], B[M - 1])) N--, M--, K++;
 
-    map([].push.apply(diff, A.slice(0, i)), function (atom) {
-        return { operation: 'none', atom: atom };
-    });
+    diff.push(...A.slice(0, i));
 
     var lcs = LCS(A.slice(i, N), B.slice(j, M), equals);
 
@@ -217,11 +210,10 @@ var diff = function (A, B, equals) {
         var ni = customIndexOf.call(A, atom, i, equals);
         var nj = customIndexOf.call(B, atom, j, equals);
 
-        // XXX ES5 map
         // Delete unmatched atoms from A
         [].push.apply(
             diff,
-            map(A.slice(i, ni), function (atom) {
+            A.slice(i, ni).map(function (atom) {
                 return { operation: 'delete', atom: atom };
             })
         );
@@ -229,7 +221,7 @@ var diff = function (A, B, equals) {
         // Add unmatched atoms from B
         [].push.apply(
             diff,
-            map(B.slice(j, nj), function (atom) {
+            B.slice(j, nj).map(function (atom) {
                 return { operation: 'add', atom: atom };
             })
         );
@@ -245,21 +237,21 @@ var diff = function (A, B, equals) {
 
     [].push.apply(
         diff,
-        map(A.slice(i, N), function (atom) {
+        A.slice(i, N).map(function (atom) {
             return { operation: 'delete', atom: atom };
         })
     );
 
     [].push.apply(
         diff,
-        map(B.slice(j, M), function (atom) {
+        B.slice(j, M).map(function (atom) {
             return { operation: 'add', atom: atom };
         })
     );
 
     [].push.apply(
         diff,
-        map(A.slice(N, N + K), function (atom) {
+        A.slice(N, N + K).map(function (atom) {
             return { operation: 'none', atom: atom };
         })
     );
