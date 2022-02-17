@@ -33,11 +33,15 @@ function suite(name, tests) {
  */
 function test(name, testFunc) {
     const fullName = currentSuite ? currentSuite + '_' + name : name;
+    const testName = fullName
+    const filename = options.getFileName ? options.getFileName(testName) : testName;
+
     tests.push({
         name: fullName,
         testFunc,
         suite: currentSuite,
-        filename: fullName.replace(/[^a-z0-9]/gi, '_'),
+        filename: filename.replace(/[^a-z0-9]/gi, '_'),
+        testName: testName.replace(/[^a-z0-9]/gi, '_')
     });
 }
 
@@ -119,13 +123,17 @@ function listTests(filter) {
     getTests(filter).forEach(testsEnv.list);
 }
 
+function listTestFilenames(filter) {
+    getTests(filter).forEach(testsEnv.listFilename);
+}
+
 function getTests(filter) {
     if (!filter) return tests;
     return tests.filter(_includeTest.bind(null, filter));
 }
 
 var _includeTest = function (filter, test) {
-    var testName = test.filename;
+    var testName = test.testName;
     return testName.match(filter) != null;
 };
 
@@ -249,6 +257,7 @@ global.jo = framework;
 module.exports = Object.assign(framework, {
     runTests,
     listTests,
+    listTestFilenames,
     cancelTests,
     config,
     setTestEnv,

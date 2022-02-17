@@ -34,7 +34,11 @@ function handleResult(result) {
 }
 
 function list(test) {
-    console.log('test:', test.filename);
+    console.log('test:', test.testName);
+}
+
+function listFilename(test) {
+    console.log(test.testName + ': ' + test.filename);
 }
 
 function _ajax(url) {
@@ -80,4 +84,5 @@ setTestEnv({
     getAcceptedResult,
     handleResult,
     list,
+    listFilename,
 });
