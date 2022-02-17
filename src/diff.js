@@ -33,7 +33,6 @@ var LCS = function (A, B, /* optional */ equals) {
         var Delta = N - M;
         var halfMaxCeil = ((Max + 1) / 2) | 0;
 
-        var foundOverlap = false;
         var overlap = null;
 
         // Maps -Max .. 0 .. +Max, diagonal index to endpoints for furthest reaching
@@ -142,11 +141,11 @@ var LCS = function (A, B, /* optional */ equals) {
             if (D > 1) {
                 lcs(startA, x - 1, startB, y - 1);
                 if (x <= u) {
-                    [].push.apply(lcsAtoms, A.slice(x, u + 1));
+                    lcsAtoms.push(...A.slice(x, u + 1));
                 }
                 lcs(u + 1, endA, v + 1, endB);
-            } else if (M > N) [].push.apply(lcsAtoms, A.slice(startA, endA + 1));
-            else [].push.apply(lcsAtoms, B.slice(startB, endB + 1));
+            } else if (M > N) lcsAtoms.push(...A.slice(startA, endA + 1));
+            else lcsAtoms.push(...B.slice(startB, endB + 1));
         }
     };
 
@@ -211,17 +210,15 @@ var diff = function (A, B, equals) {
         var nj = customIndexOf.call(B, atom, j, equals);
 
         // Delete unmatched atoms from A
-        [].push.apply(
-            diff,
-            A.slice(i, ni).map(function (atom) {
+        diff.push(
+            ...A.slice(i, ni).map(function (atom) {
                 return { operation: 'delete', atom: atom };
             })
         );
 
         // Add unmatched atoms from B
-        [].push.apply(
-            diff,
-            B.slice(j, nj).map(function (atom) {
+        diff.push(
+            ...B.slice(j, nj).map(function (atom) {
                 return { operation: 'add', atom: atom };
             })
         );
@@ -235,23 +232,20 @@ var diff = function (A, B, equals) {
 
     // Don't forget about the rest
 
-    [].push.apply(
-        diff,
-        A.slice(i, N).map(function (atom) {
+    diff.push(
+        ...A.slice(i, N).map(function (atom) {
             return { operation: 'delete', atom: atom };
         })
     );
 
-    [].push.apply(
-        diff,
-        B.slice(j, M).map(function (atom) {
+    diff.push(
+        ...B.slice(j, M).map(function (atom) {
             return { operation: 'add', atom: atom };
         })
     );
 
-    [].push.apply(
-        diff,
-        A.slice(N, N + K).map(function (atom) {
+    diff.push(
+        ...A.slice(N, N + K).map(function (atom) {
             return { operation: 'none', atom: atom };
         })
     );
