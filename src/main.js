@@ -101,7 +101,9 @@ async function runTests(filter, resultsPath) {
         let expectedResult;
         try {
             expectedResult = await testsEnv.getAcceptedResult();
-        } catch (reason) {}
+        } catch (reason) {
+            expectedResult = null;
+        }
         const comparison = _compareResultToAccepted(expectedResult);
         testsEnv.handleResult(comparison);
     }
@@ -205,7 +207,7 @@ function _compareResultToAccepted(expected) {
     const actual = currentTest.output;
     let fullContext = false;
 
-    if (!expected) {
+    if (expected === null) {
         var message = 'No accepted output (' + testsEnv.getAcceptedResultPath() + ')';
         if (fullContext) message += '. Output: \n' + actual;
         return { pass: false, message: message };

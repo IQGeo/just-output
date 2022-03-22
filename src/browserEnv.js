@@ -82,6 +82,7 @@ setTestEnv({
     startTest,
     writeTmpResult,
     getAcceptedResult,
+    getAcceptedResultPath,
     handleResult,
     list,
     listFilename,
