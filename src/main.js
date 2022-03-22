@@ -33,7 +33,7 @@ function suite(name, tests) {
  */
 function test(name, testFunc) {
     const fullName = currentSuite ? currentSuite + '_' + name : name;
-    const testName = fullName
+    const testName = fullName;
     const filename = options.getFileName ? options.getFileName(testName) : testName;
 
     tests.push({
@@ -41,7 +41,7 @@ function test(name, testFunc) {
         testFunc,
         suite: currentSuite,
         filename: filename.replace(/[^a-z0-9]/gi, '_'),
-        testName: testName.replace(/[^a-z0-9]/gi, '_')
+        testName: testName.replace(/[^a-z0-9]/gi, '_'),
     });
 }
 

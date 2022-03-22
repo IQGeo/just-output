@@ -2,7 +2,6 @@ const lib = require('./main');
 const { setTestEnv } = lib;
 module.exports = lib;
 
-
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -56,7 +55,7 @@ function list(test) {
 }
 
 function listFilename(test) {
-    console.log(test.testName + ": " + test.filename);
+    console.log(test.testName + ': ' + test.filename);
 }
 
 setTestEnv({
@@ -66,5 +65,5 @@ setTestEnv({
     getAcceptedResult,
     handleResult,
     list,
-    listFilename
+    listFilename,
 });
