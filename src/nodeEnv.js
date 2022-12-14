@@ -1,14 +1,9 @@
-const lib = require('./main');
-const { setTestEnv } = lib;
-module.exports = lib;
+import { writeFileSync, readFileSync } from 'fs';
+import { tmpdir as _tmpdir } from 'os';
+import { join, resolve } from 'path';
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-let tmpdir = os.tmpdir();
+let tmpdir = _tmpdir();
 let resultsPath = 'results';
-
-let currentTest;
 
 function startRun(lResultsPath, options) {
     if (lResultsPath) resultsPath = lResultsPath;
@@ -16,55 +11,34 @@ function startRun(lResultsPath, options) {
     console.log('Temp directory: ', tmpdir);
 }
 
-function startTest(test) {
-    currentTest = test;
+function writeTmpResult(test) {
+    let resultFilePath = join(tmpdir, test.filename + '.txt');
+    writeFileSync(resultFilePath, test.output);
 }
 
-function writeTmpResult() {
-    let resultFilePath = path.join(tmpdir, currentTest.filename + '.txt');
-    fs.writeFileSync(resultFilePath, currentTest.output);
-}
-
-function getAcceptedResult() {
-    const acceptedFilePath = getAcceptedResultPath();
+function getAcceptedResult(test) {
+    const acceptedFilePath = getAcceptedResultPath(test);
     let acceptedOutput;
 
     try {
-        acceptedOutput = fs.readFileSync(acceptedFilePath, 'utf-8');
+        acceptedOutput = readFileSync(acceptedFilePath, 'utf-8');
     } catch (error) {
         console.log(error);
     }
     return Promise.resolve(acceptedOutput);
 }
 
-function getAcceptedResultPath() {
-    return path.resolve(resultsPath, currentTest.filename + '.txt');
+function getAcceptedResultPath(test) {
+    return resolve(resultsPath, test.filename + '.txt');
 }
 
-function handleResult(result) {
+function handleResult(test, result) {
     if (result.pass) {
-        console.log(currentTest.name + ': PASSED');
+        console.log(test.name + ': PASSED');
     } else {
-        console.log(currentTest.name + ':\t' + result.message.slice(0, 180));
-        console.log(currentTest.name + ': FAILED');
+        console.log(test.name + ':\t' + result.message.slice(0, 180));
+        console.log(test.name + ': FAILED');
     }
 }
 
-function list(test) {
-    console.log('test:', test.testName);
-}
-
-function listFilename(test) {
-    console.log(test.testName + ': ' + test.filename);
-}
-
-setTestEnv({
-    startRun,
-    startTest,
-    writeTmpResult,
-    getAcceptedResult,
-    getAcceptedResultPath,
-    handleResult,
-    list,
-    listFilename,
-});
+export default { startRun, writeTmpResult, getAcceptedResult, getAcceptedResultPath, handleResult };

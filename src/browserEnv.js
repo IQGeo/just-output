@@ -1,8 +1,4 @@
-import { setTestEnv, suite, test, tests, output, subTest, section } from './main';
-export * from './main';
-
 let resultsPath = 'results';
-let currentTest;
 
 function startRun(lResultsPath, options) {
     if (lResultsPath) resultsPath = lResultsPath;
@@ -10,35 +6,23 @@ function startRun(lResultsPath, options) {
     justOutputUIRender(true);
 }
 
-function startTest(test) {
-    currentTest = test;
-}
-
-function writeTmpResult() {
+function writeTmpResult(test) {
     //do nothing
     //ENH: write file via a chrome plugin?
 }
 
-function getAcceptedResult() {
-    const acceptedFilePath = getAcceptedResultPath();
+function getAcceptedResult(test) {
+    const acceptedFilePath = getAcceptedResultPath(test);
     const url = acceptedFilePath + '?' + Math.random(); //add a random param to the url so that the browser doesn't use cached results
     return _ajax(url);
 }
 
-function getAcceptedResultPath() {
-    return resultsPath + '/' + currentTest.filename + '.txt';
+function getAcceptedResultPath(test) {
+    return resultsPath + '/' + test.filename + '.txt';
 }
 
-function handleResult(result) {
-    window.handleTestResult(result, currentTest);
-}
-
-function list(test) {
-    console.log('test:', test.testName);
-}
-
-function listFilename(test) {
-    console.log(test.testName + ': ' + test.filename);
+function handleResult(test, result) {
+    window.handleTestResult(result, test);
 }
 
 function _ajax(url) {
@@ -77,13 +61,4 @@ function _ajax(url) {
     });
 }
 
-setTestEnv({
-    startRun,
-    startTest,
-    writeTmpResult,
-    getAcceptedResult,
-    getAcceptedResultPath,
-    handleResult,
-    list,
-    listFilename,
-});
+export default { startRun, writeTmpResult, getAcceptedResult, getAcceptedResultPath, handleResult };

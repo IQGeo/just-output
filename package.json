@@ -1,11 +1,19 @@
 {
     "name": "just-output",
-    "version": "0.3.1",
+    "version": "0.4.0",
     "description": "Test framework based on outputing results and comparing it with the expected result on file",
-    "main": "src/nodeEnv.js",
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./src/main.js"
+        },
+        "./nodeEnv": {
+            "import": "./src/nodeEnv.js"
+        }
+    },
     "scripts": {
-        "build": "webpack",
-        "watch": "webpack --watch",
+        "build": "webpack --mode production",
+        "watch": "webpack --mode development --watch",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
@@ -15,37 +23,9 @@
     ],
     "author": "Luis Camacho",
     "license": "ISC",
-    "dependencies": {},
     "devDependencies": {
-        "@babel/core": "^7.15.0",
-        "@babel/plugin-proposal-object-rest-spread": "^7.14.7",
-        "@babel/preset-env": "^7.15.0",
-        "babel-core": "^6.26.3",
-        "babel-loader": "^7.1.5",
-        "babel-plugin-import": "^1.13.3",
-        "babel-preset-react": "6.24.1",
-        "babel-preset-stage-0": "6.24.1",
-        "expose-loader": "^0.7.5",
-        "prettier": "^2.3.2",
-        "style-loader": "^0.20.3",
-        "webpack": "^5.49.0",
-        "webpack-cli": "^4.7.2"
-    },
-    "babel": {
-        "presets": [
-            "react",
-            "stage-0"
-        ],
-        "plugins": [
-            [
-                "import",
-                {
-                    "libraryName": "antd",
-                    "libraryDirectory": "es",
-                    "style": "css"
-                }
-            ]
-        ]
+        "eslint": "^8.29.0",
+        "prettier": "^2.3.2"
     },
     "prettier": {
         "tabWidth": 4,

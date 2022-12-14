@@ -260,5 +260,4 @@ var customIndexOf = function (item, start, equals) {
     return -1;
 };
 
-// Exports
-module.exports = diff;
+export default diff;
