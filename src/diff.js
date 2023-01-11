@@ -170,7 +170,7 @@ LCS.StringLCS = function (A, B) {
 };
 
 // Exports
-if (typeof module !== 'undefined') module.exports = LCS;
+// if (typeof module !== 'undefined') module.exports = LCS;
 
 // Diff sequence
 // @param A - sequence of atoms - Array
