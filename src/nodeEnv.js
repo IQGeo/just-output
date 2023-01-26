@@ -1,6 +1,10 @@
-import { writeFileSync, readFileSync } from 'fs';
-import { tmpdir as _tmpdir } from 'os';
-import { join, resolve } from 'path';
+// import { writeFileSync, readFileSync } from 'fs';
+// import { tmpdir as _tmpdir } from 'os';
+// import { join, resolve } from 'path';
+
+const { writeFileSync, readFileSync } = require('fs');
+const { tmpdir: _tmpdir } = require('os');
+const { join, resolve } = require('path');
 
 let tmpdir = _tmpdir();
 let resultsPath = 'results';
@@ -41,4 +45,12 @@ function handleResult(test, result) {
     }
 }
 
-export default { startRun, writeTmpResult, getAcceptedResult, getAcceptedResultPath, handleResult };
+module.exports = {
+    startRun,
+    writeTmpResult,
+    getAcceptedResult,
+    getAcceptedResultPath,
+    handleResult,
+};
+
+// export default { startRun, writeTmpResult, getAcceptedResult, getAcceptedResultPath, handleResult };

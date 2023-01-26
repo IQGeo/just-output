@@ -56,7 +56,9 @@ export default class TestRunner {
             const comparison = _compareResultToAccepted(expectedResult);
             testsEnv.handleResult(test, comparison);
         }
-        if (filter && c !== 1) console.log(`Ran ${c} tests out of ${this._tests.length}`);
+        if (c !== 1 && c !== this._tests.length) {
+            console.log(`Ran ${c} tests out of ${this._tests.length}`);
+        }
     }
 
     async runTest(testFunc) {
