@@ -81,7 +81,7 @@ export default class TestRunner {
 
     listTestFilenames(filter) {
         this.getTests(filter).forEach((test) => {
-            console.log(test.testName + ': ' + options.getFilename(test));
+            console.log(test.name + ': ' + options.getFilename(test));
         });
     }
 
