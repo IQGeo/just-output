@@ -56,7 +56,12 @@ export function section(name, test) {
 export function subTest(name, test) {
     current.test.subTests.push(async function () {
         output('\n***', name);
-        await test();
+        try {
+            await test();
+        } catch (reason) {
+            var error = reason instanceof Error ? reason : new Error(reason.msg || reason);
+            error.stack.split('\n').forEach((line) => output(line));
+        }
     });
 }
 
