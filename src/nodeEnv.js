@@ -52,5 +52,3 @@ module.exports = {
     getAcceptedResultPath,
     handleResult,
 };
-
-// export default { startRun, writeTmpResult, getAcceptedResult, getAcceptedResultPath, handleResult };

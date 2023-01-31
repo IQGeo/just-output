@@ -10,10 +10,3 @@ export const testRunner = (specs, env = browserEnv) => {
 };
 
 export const tests = testRunner(specs);
-
-// // define module.exports for when using node's dynamic import()
-// if (typeof module !== 'undefined')
-//     module.exports = {
-//         specs,
-//         testRunner,
-//     };

@@ -138,6 +138,7 @@ var LCS = function (A, B, /* optional */ equals) {
                 v = middleSnake[1][1];
             var D = middleSnake[2];
 
+            // @ts-ignore
             if (D > 1) {
                 lcs(startA, x - 1, startB, y - 1);
                 if (x <= u) {
