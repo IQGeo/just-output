@@ -56,11 +56,7 @@ export function section(name, test) {
 export function subTest(name, test) {
     current.test.subTests.push(async function () {
         output('\n***', name);
-        try {
-            await test();
-        } catch (e) {
-            _handleUnexpectedRejection(e);
-        }
+        await test();
     });
 }
 
@@ -72,23 +68,23 @@ export function output(...args) {
 
 function _stringify(obj, indentLvl) {
     // if (obj instanceof Set) obj = [...obj];
-    var type = Object.prototype.toString.call(obj);
+    const type = Object.prototype.toString.call(obj);
     indentLvl = indentLvl || 1;
-    var indent = new Array(indentLvl + 1).join('\t'),
+    const indent = new Array(indentLvl + 1).join('\t'),
         indentClose = new Array(indentLvl).join('\t');
     if (type === '[object Object]') {
-        var pairs = [];
-        for (var k in obj) {
+        const pairs = [];
+        for (const k in obj) {
             if (!obj.hasOwnProperty(k)) continue;
             pairs.push([k, _stringify(obj[k], indentLvl + 1)]);
         }
         pairs.sort(function (a, b) {
             return a[0] < b[0] ? -1 : 1;
         });
-        pairs = pairs.reduce(function (m, v, i) {
+        let pairsStr = pairs.reduce(function (m, v, i) {
             return (i ? m + ',\n' : '') + indent + '"' + v[0] + '": ' + v[1];
         }, '');
-        return '{\n' + pairs + '\n' + indentClose + '}';
+        return '{\n' + pairsStr + '\n' + indentClose + '}';
     } else if (type === '[object Array]') {
         return (
             '[\n' +
