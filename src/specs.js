@@ -72,7 +72,7 @@ export function output(...args) {
 }
 
 function _stringify(obj, indentLvl) {
-    // if (obj instanceof Set) obj = [...obj];
+    if (obj instanceof Set) obj = [...obj].sort();
     const type = Object.prototype.toString.call(obj);
     indentLvl = indentLvl || 1;
     const indent = new Array(indentLvl + 1).join('\t'),
