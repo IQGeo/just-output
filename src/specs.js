@@ -37,7 +37,7 @@ export function test(name, testFunc) {
 /**
  * Defines a section in the current test
  * @param {string} name
- * @param {function} [test]
+ * @param {function} [test] Optional sub test to execute
  */
 export function section(name, test) {
     if (typeof test == 'function') {
@@ -49,9 +49,10 @@ export function section(name, test) {
 }
 
 /**
- * Defines a sub test
+ * Defines a sub test.
+ * Output will be in same file as parent test but identified with the sub test's name
  * @param {string} name
- * @param {function} [test]
+ * @param {function} test Sub test to execute.
  */
 export function subTest(name, test) {
     current.test.subTests.push(async function () {
@@ -65,6 +66,11 @@ export function subTest(name, test) {
     });
 }
 
+/**
+ * Outputs the given arguments to the result of the test.
+ * Values are stringified for readability and sorted for consistency
+ * @param  {...any} args
+ */
 export function output(...args) {
     const strArgs = args.map((value) => (typeof value == 'string' ? value : _stringify(value)));
     current.test.output += strArgs.join(' ');
