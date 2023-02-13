@@ -1,4 +1,4 @@
-const tests = [];
+export const tests = [];
 let currentSuite;
 let current = {};
 

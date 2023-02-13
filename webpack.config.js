@@ -1,14 +1,14 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
-    entry: './src/main.js',
-    output: {
-        filename: './just-output.js',
-        path: path.resolve(__dirname, 'dist'),
-        globalObject: 'this',
-        library: {
-            name: 'jo',
-            type: 'umd',
-        },
+export const entry = './src/main.js';
+export const output = {
+    filename: './just-output.js',
+    path: path.resolve('./dist'),
+    globalObject: 'this',
+    library: {
+        name: 'jo',
+        type: 'umd',
     },
 };
+
+export default { entry, output };
