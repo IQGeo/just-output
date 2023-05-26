@@ -21,15 +21,20 @@ export function suite(name, tests) {
 
 /**
  * Declares a test, result is stored in a separate file
- * @param  {string} name        Name of test
- * @param  {function} testFunc  Function to execute as part of test
+ * @param  {any[]} args        Arguments, in the format (name: string, opts: Record<string, any> (optional), testFunc: function)
  */
-export function test(name, testFunc) {
+export function test(...args) {
+    const argsLength = args.length;
+    const name = args[0];
+    const testFunc = argsLength >= 3 ? args[2] : args[1];
+    const testOpts = argsLength >= 3 ? args[1] : {};
+
     const fullName = currentSuite ? currentSuite + '_' + name : name;
 
     tests.push({
         name: fullName.replace(/[^a-z0-9]/gi, '_'),
         testFunc,
+        testOpts,
         suite: currentSuite,
     });
 }
@@ -51,14 +56,18 @@ export function section(name, test) {
 /**
  * Defines a sub test.
  * Output will be in same file as parent test but identified with the sub test's name
- * @param {string} name
- * @param {function} test Sub test to execute.
+ * @param  {any[]} args        Arguments, in the format (name: string, opts: Record<string, any> (optional), testFunc: function)
  */
-export function subTest(name, test) {
+export function subTest(...args) {
+    const argsLength = args.length;
+    const name = args[0];
+    const testFunc = argsLength >= 3 ? args[2] : args[1];
+    const testOpts = argsLength >= 3 ? args[1] : {};
+
     current.test.subTests.push(async function () {
         output('\n***', name);
         try {
-            await test();
+            await testFunc();
         } catch (reason) {
             var error = reason instanceof Error ? reason : new Error(reason.msg || reason);
             error.stack.split('\n').forEach((line) => output(line));
