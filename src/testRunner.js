@@ -3,7 +3,12 @@ import specs, { setCurrentTest, output } from './specs.js';
 
 const options = {
     tmpdir: undefined, //default is up to env
-    getFilename: (test) => test.name,
+    getFilename: async (test) => {
+        const testFilenameFunc = test.testOpts.testFilename;
+        if (testFilenameFunc === undefined) return test.name;
+        if (typeof testFilenameFunc === 'function') return testFilenameFunc(test.name);
+        else return testFilenameFunc;
+    },
     getTestName: (test) => test.name,
 };
 
@@ -40,7 +45,7 @@ export default class TestRunner {
             setCurrentTest(test);
             test.output = '';
             test.subTests = [];
-            test.filename = options.getFilename(test);
+            test.filename = await Promise.resolve(options.getFilename(test));
             try {
                 await this.runTest(test.testFunc);
                 for (const subTest of test.subTests) {
@@ -89,8 +94,9 @@ export default class TestRunner {
 
     async listTestFilenames(filter) {
         const tests = await this.getTests(filter, { logSkippedTests: false });
-        tests.forEach((test) => {
-            console.log(test.name + ': ' + options.getFilename(test));
+        const testFilenames = await Promise.all(tests.map((test) => options.getFilename(test)));
+        tests.forEach((test, i) => {
+            console.log(test.name + ': ' + testFilenames[i]);
         });
     }
 
