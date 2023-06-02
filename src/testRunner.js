@@ -35,7 +35,7 @@ export default class TestRunner {
         for (const test of this._tests) {
             if (cancelRun) break;
             if (filter && !_includeTest(filter, test)) continue;
-            if (!(await _shouldRunTest(test))) {
+            if (!_shouldRunTest(test)) {
                 totalTests--;
                 continue;
             }
@@ -45,7 +45,7 @@ export default class TestRunner {
             setCurrentTest(test);
             test.output = '';
             test.subTests = [];
-            test.filename = await Promise.resolve(options.getFilename(test));
+            test.filename = await options.getFilename(test);
             try {
                 await this.runTest(test.testFunc);
                 for (const subTest of test.subTests) {
@@ -85,32 +85,25 @@ export default class TestRunner {
         cancelRun = true;
     }
 
-    async listTests(filter) {
-        const tests = await this.getTests(filter, { logSkippedTests: false });
+    listTests(filter) {
+        const tests = this.getTests(filter, { logSkippedTests: false });
         tests.forEach((test) => {
             console.log('test:', options.getTestName(test));
         });
     }
 
     async listTestFilenames(filter) {
-        const tests = await this.getTests(filter, { logSkippedTests: false });
+        const tests = this.getTests(filter, { logSkippedTests: false });
         const testFilenames = await Promise.all(tests.map((test) => options.getFilename(test)));
         tests.forEach((test, i) => {
             console.log(test.name + ': ' + testFilenames[i]);
         });
     }
 
-    async getTests(filter, options) {
+    getTests(filter, options) {
         let tests = specs;
         if (filter) tests = tests.filter(_includeTest.bind(null, filter));
-        tests = (
-            await Promise.all(
-                tests.map(async (test) => {
-                    const res = await _shouldRunTest(test, options);
-                    return res ? test : null;
-                })
-            )
-        ).filter((test) => test);
+        tests = tests.filter((test) => _shouldRunTest(test, options));
         return tests;
     }
 }
@@ -159,15 +152,13 @@ const _includeTest = function (filter, test) {
     return test.name.match(filter) != null;
 };
 
-const _shouldRunTest = async function (test, { logSkippedTests = true } = {}) {
+const _shouldRunTest = function (test, { logSkippedTests = true } = {}) {
     const testName = options.getTestName(test);
     const shouldRunTestFunc = test.testOpts.shouldRunTest;
     if (shouldRunTestFunc === undefined) return true;
 
     const shouldRunTestRes =
-        typeof shouldRunTestFunc === 'function'
-            ? await Promise.resolve(shouldRunTestFunc())
-            : !!shouldRunTestFunc;
+        typeof shouldRunTestFunc === 'function' ? shouldRunTestFunc() : !!shouldRunTestFunc;
     if (typeof shouldRunTestRes === 'string') {
         if (logSkippedTests) console.log(`Skipping test ${testName}: ${shouldRunTestRes}`);
         return false;
