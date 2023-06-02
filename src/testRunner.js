@@ -3,7 +3,12 @@ import specs, { setCurrentTest, output } from './specs.js';
 
 const options = {
     tmpdir: undefined, //default is up to env
-    getFilename: (test) => test.name,
+    getFilename: (test) => {
+        const testFilenameFunc = test.testOpts.testFilename;
+        if (testFilenameFunc === undefined) return test.name;
+        if (typeof testFilenameFunc === 'function') return testFilenameFunc(test.name);
+        else return testFilenameFunc;
+    },
     getTestName: (test) => test.name,
 };
 
@@ -25,9 +30,16 @@ export default class TestRunner {
         cancelRun = false;
         testsEnv.startRun(resultsPath, options);
         let c = 0;
+        let totalTests = this._tests.length;
+
         for (const test of this._tests) {
             if (cancelRun) break;
             if (filter && !_includeTest(filter, test)) continue;
+            if (!_shouldRunTest(test)) {
+                totalTests--;
+                continue;
+            }
+
             c++;
             currentTest = test;
             setCurrentTest(test);
@@ -56,8 +68,8 @@ export default class TestRunner {
             const comparison = _compareResultToAccepted(expectedResult);
             testsEnv.handleResult(test, comparison);
         }
-        if (c !== 1 && c !== this._tests.length) {
-            console.log(`Ran ${c} tests out of ${this._tests.length}`);
+        if (c !== 1 && c !== totalTests) {
+            console.log(`Ran ${c} tests out of ${totalTests}`);
         }
     }
 
@@ -74,20 +86,24 @@ export default class TestRunner {
     }
 
     listTests(filter) {
-        this.getTests(filter).forEach((test) => {
+        const tests = this.getTests(filter, { logSkippedTests: false });
+        tests.forEach((test) => {
             console.log('test:', options.getTestName(test));
         });
     }
 
-    listTestFilenames(filter) {
-        this.getTests(filter).forEach((test) => {
+    async listTestFilenames(filter) {
+        const tests = this.getTests(filter, { logSkippedTests: false });
+        tests.forEach((test) => {
             console.log(test.name + ': ' + options.getFilename(test));
         });
     }
 
-    getTests(filter) {
-        if (!filter) return specs;
-        return specs.filter(_includeTest.bind(null, filter));
+    getTests(filter, options) {
+        let tests = specs;
+        if (filter) tests = tests.filter(_includeTest.bind(null, filter));
+        tests = tests.filter((test) => _shouldRunTest(test, options));
+        return tests;
     }
 }
 
@@ -133,6 +149,26 @@ function _compareResultToAccepted(expected) {
 
 const _includeTest = function (filter, test) {
     return test.name.match(filter) != null;
+};
+
+const _shouldRunTest = function (test, { logSkippedTests = true } = {}) {
+    const testName = options.getTestName(test);
+    const shouldRunTestFunc = test.testOpts.shouldRunTest;
+    if (shouldRunTestFunc === undefined) return true;
+
+    const shouldRunTestRes =
+        typeof shouldRunTestFunc === 'function' ? shouldRunTestFunc() : !!shouldRunTestFunc;
+    if (typeof shouldRunTestRes === 'string') {
+        if (logSkippedTests) console.log(`Skipping test ${testName}: ${shouldRunTestRes}`);
+        return false;
+    }
+
+    if (shouldRunTestRes === false) {
+        if (logSkippedTests) console.log(`Skipping test ${testName}`);
+        return false;
+    }
+
+    return true;
 };
 
 function _handleUnexpectedRejection(reason) {
