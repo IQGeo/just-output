@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "outDir": "dist/esm",
+        "checkJs": true,
+        "declaration": true,
+        "skipLibCheck": true
+    },
+    "include": ["src", "typings"]
+}
