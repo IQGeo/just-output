@@ -2,7 +2,7 @@ import path from 'path';
 
 export const entry = './src/main.js';
 export const output = {
-    filename: './just-output.js',
+    filename: './cjs/just-output.js',
     path: path.resolve('./dist'),
     globalObject: 'this',
     library: {

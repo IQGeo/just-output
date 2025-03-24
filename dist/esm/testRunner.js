@@ -1,23 +1,23 @@
 import diff from './diff.js';
 import specs, { setCurrentTest, output } from './specs.js';
-
 /** @satisfies {TestRunnerOptions} */
 const options = {
     tmpdir: undefined, //default is up to env
     getFilename: (test) => {
         const testFilenameFunc = test.testOpts.testFilename;
-        if (testFilenameFunc === undefined) return test.name;
-        if (typeof testFilenameFunc === 'function') return testFilenameFunc(test.name);
-        else return testFilenameFunc;
+        if (testFilenameFunc === undefined)
+            return test.name;
+        if (typeof testFilenameFunc === 'function')
+            return testFilenameFunc(test.name);
+        else
+            return testFilenameFunc;
     },
     getTestName: (test) => test.name,
 };
-
 let cancelRun = false;
 /** @type {TestEnv} */
 let testsEnv;
 let currentTest;
-
 export default class TestRunner {
     /**
      * @param {Array<import('./specs.js').Test>} tests
@@ -27,14 +27,12 @@ export default class TestRunner {
         this._tests = tests;
         testsEnv = env;
     }
-
     /**
      * @param {TestRunnerOptions} newOptions
      */
     setOptions(newOptions) {
         Object.assign(options, newOptions);
     }
-
     /**
      * @param {RegExp} filter
      * @param {string} resultsPath
@@ -44,15 +42,15 @@ export default class TestRunner {
         testsEnv.startRun(resultsPath, options);
         let c = 0;
         let totalTests = this._tests.length;
-
         for (const test of this._tests) {
-            if (cancelRun) break;
-            if (filter && !_includeTest(filter, test)) continue;
+            if (cancelRun)
+                break;
+            if (filter && !_includeTest(filter, test))
+                continue;
             if (!_shouldRunTest(test)) {
                 totalTests--;
                 continue;
             }
-
             c++;
             currentTest = test;
             setCurrentTest(test);
@@ -64,18 +62,21 @@ export default class TestRunner {
                 for (const subTest of test.subTests) {
                     await this.runTest(subTest);
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 _handleUnexpectedRejection(e);
             }
             try {
                 await testsEnv.writeTmpResult(test);
-            } catch (e) {
+            }
+            catch (e) {
                 console.log(e);
             }
             let expectedResult;
             try {
                 expectedResult = await testsEnv.getAcceptedResult(test);
-            } catch (reason) {
+            }
+            catch (reason) {
                 expectedResult = null;
             }
             const comparison = _compareResultToAccepted(expectedResult);
@@ -85,22 +86,20 @@ export default class TestRunner {
             console.log(`Ran ${c} tests out of ${totalTests}`);
         }
     }
-
     /**
      * @param {Function} testFunc
      */
     async runTest(testFunc) {
         try {
             await testFunc();
-        } catch (e) {
+        }
+        catch (e) {
             _handleUnexpectedRejection(e);
         }
     }
-
     cancelTests() {
         cancelRun = true;
     }
-
     /**
      * @param {RegExp} filter
      */
@@ -110,7 +109,6 @@ export default class TestRunner {
             console.log('test:', options.getTestName(test));
         });
     }
-
     /**
      * @param {RegExp} filter
      */
@@ -120,36 +118,31 @@ export default class TestRunner {
             console.log(test.name + ': ' + options.getFilename(test));
         });
     }
-
     /**
      * @param {RegExp} filter
      * @param {ShouldRunTestOptions} options
      */
     getTests(filter, options) {
         let tests = specs;
-        if (filter) tests = tests.filter(_includeTest.bind(null, filter));
+        if (filter)
+            tests = tests.filter(_includeTest.bind(null, filter));
         tests = tests.filter((test) => _shouldRunTest(test, options));
         return tests;
     }
 }
-
 function _compareResultToAccepted(expected) {
     const actual = currentTest.output;
     let fullContext = false;
-
     if (expected === null) {
         var message = 'No accepted output (' + testsEnv.getAcceptedResultPath() + ')';
-        if (fullContext) message += '. Output: \n' + actual;
+        if (fullContext)
+            message += '. Output: \n' + actual;
         return { pass: false, message: message };
     }
-
     var comparison = diff(actual.split(/\r?\n/), expected.split(/\r?\n/));
     var diffs = comparison.filter((aDiff) => {
-        return (
-            typeof aDiff === 'object' && (aDiff.operation == 'add' || aDiff.operation == 'delete')
-        );
+        return (typeof aDiff === 'object' && (aDiff.operation == 'add' || aDiff.operation == 'delete'));
     });
-
     /** @type {TestResult} */
     var result = {
         pass: diffs.length === 0,
@@ -157,16 +150,20 @@ function _compareResultToAccepted(expected) {
     };
     if (result.pass) {
         result.message = 'output is equal to accepted output';
-    } else {
+    }
+    else {
         var lineDiffs = [];
         (fullContext ? comparison : diffs).forEach((aDiff) => {
             if (typeof aDiff === 'object' && aDiff.operation == 'add') {
                 lineDiffs.push('-  ' + aDiff.atom);
-            } else if (typeof aDiff === 'object' && aDiff.operation == 'delete') {
+            }
+            else if (typeof aDiff === 'object' && aDiff.operation == 'delete') {
                 lineDiffs.push('+  ' + aDiff.atom);
-            } else if (typeof aDiff === 'object' && aDiff.atom) {
+            }
+            else if (typeof aDiff === 'object' && aDiff.atom) {
                 lineDiffs.push('   ' + aDiff.atom);
-            } else {
+            }
+            else {
                 lineDiffs.push('   ' + aDiff);
             }
         });
@@ -176,7 +173,6 @@ function _compareResultToAccepted(expected) {
     }
     return result;
 }
-
 /**
  * @param {RegExp} filter
  * @param {import('./specs.js').Test} test
@@ -184,7 +180,6 @@ function _compareResultToAccepted(expected) {
 const _includeTest = function (filter, test) {
     return test.name.match(filter) != null;
 };
-
 /**
  * @param {import('./specs.js').Test} test
  * @param {ShouldRunTestOptions} options
@@ -192,56 +187,50 @@ const _includeTest = function (filter, test) {
 const _shouldRunTest = function (test, { logSkippedTests = true } = {}) {
     const testName = options.getTestName(test);
     const shouldRunTestFunc = test.testOpts.shouldRunTest;
-    if (shouldRunTestFunc === undefined) return true;
-
-    const shouldRunTestRes =
-        typeof shouldRunTestFunc === 'function' ? shouldRunTestFunc() : !!shouldRunTestFunc;
+    if (shouldRunTestFunc === undefined)
+        return true;
+    const shouldRunTestRes = typeof shouldRunTestFunc === 'function' ? shouldRunTestFunc() : !!shouldRunTestFunc;
     if (typeof shouldRunTestRes === 'string') {
-        if (logSkippedTests) console.log(`Skipping test ${testName}: ${shouldRunTestRes}`);
+        if (logSkippedTests)
+            console.log(`Skipping test ${testName}: ${shouldRunTestRes}`);
         return false;
     }
-
     if (shouldRunTestRes === false) {
-        if (logSkippedTests) console.log(`Skipping test ${testName}`);
+        if (logSkippedTests)
+            console.log(`Skipping test ${testName}`);
         return false;
     }
-
     return true;
 };
-
 function _handleUnexpectedRejection(reason) {
     var error = reason instanceof Error ? reason : new Error(reason.msg || reason);
-
-    if (
-        document &&
+    if (document &&
         document.location &&
         document.location.search &&
-        document.location.search.indexOf('spec=') >= 0
-    ) {
+        document.location.search.indexOf('spec=') >= 0) {
         //individual test run
         if (document.location.search.indexOf('catch=false') >= 0) {
             throw error;
-        } else {
+        }
+        else {
             console.log(error.stack);
             _outputErrorStack(error);
         }
-    } else {
+    }
+    else {
         //full run (node or browser)
         _outputErrorStack(error);
     }
 }
-
 function _outputErrorStack(error) {
     error.stack.split('\n').forEach((line) => output(line));
 }
-
 /**
  * @typedef {object} TestRunnerOptions
  * @property {string} [tmpdir]
  * @property {(test: import('./specs.js').Test) => string} [getFilename]
  * @property {(test: import('./specs.js').Test) => string} [getTestName]
  */
-
 /**
  * @typedef {object} TestEnv
  * @property {(resultsPath: string, opts: typeof options) => void} startRun
@@ -250,7 +239,6 @@ function _outputErrorStack(error) {
  * @property {(test?: import('./specs.js').Test) => string} getAcceptedResultPath
  * @property {(test: import('./specs.js').Test, result: TestResult) => void} handleResult
  */
-
 /**
  * @typedef {object} TestResult
  * @property {boolean} pass
@@ -258,7 +246,6 @@ function _outputErrorStack(error) {
  * @property {Array<import('./diff.js').Diff>} [diffs]
  * @property {Array<import('./diff.js').Diff>} [comparison]
  */
-
 /**
  * @typedef {object} ShouldRunTestOptions
  * @property {boolean} [logSkippedTests]
