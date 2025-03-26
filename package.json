@@ -1,6 +1,6 @@
 {
     "name": "just-output",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Test framework based on outputing results and comparing it with the expected result on file",
     "type": "module",
     "exports": {
