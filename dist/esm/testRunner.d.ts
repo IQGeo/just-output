@@ -24,6 +24,13 @@ export default class TestRunner {
      */
     listTests(filter: RegExp): void;
     /**
+     * Show JSON-formatted metadata listing the tests and their test options,
+     * tags, etc.
+     *
+     * @param {RegExp} filter
+     */
+    testsMeta(filter: RegExp): void;
+    /**
      * @param {RegExp} filter
      */
     listTestFilenames(filter: RegExp): Promise<void>;
