@@ -126,7 +126,7 @@ export default class TestRunner {
                  .map(({name, testOpts, suite, filename}) => ({name, testOpts, suite, filename}))
                  .reduce((obj, test) => (obj[test.name] = test, obj), {});
         return {
-            "by_test_name": metadataByName,
+            "byTestName": metadataByName,
             "order": testNames
         }
     }
@@ -295,5 +295,5 @@ function _outputErrorStack(error) {
 /**
  * @typedef {object} TestsMeta
  * @property {Array<string>} order
- * @property {Object.<string, SingleTestMeta>} by_test_name
+ * @property {Object.<string, SingleTestMeta>} byTestName
  */

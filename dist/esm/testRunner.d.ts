@@ -70,7 +70,7 @@ export type SingleTestMeta = {
 };
 export type TestsMeta = {
     order: Array<string>;
-    by_test_name: {
+    byTestName: {
         [x: string]: SingleTestMeta;
     };
 };
