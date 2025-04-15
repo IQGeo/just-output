@@ -112,23 +112,22 @@ export default class TestRunner {
     }
 
     /**
-     * Show JSON-formatted metadata listing the tests and their test options,
+     * Produce serializable metadata listing the tests and their test options,
      * tags, etc.
      *
      * @param {RegExp} filter
      */
-    testsMeta(filter) {
+    getTestsMeta(filter) {
         const tests = this.getTests(filter, { logSkippedTests: false });
         const testNames = tests.map(test => test.name);
         const metadataByName =
             tests.map(test => ({...test, filename: options.getFilename(test)}))
                  .map(({name, testOpts, suite, filename}) => ({name, testOpts, suite, filename}))
                  .reduce((obj, test) => (obj[test.name] = test, obj), {});
-        const metadata = {
+        return {
             "by_test_name": metadataByName,
             "order": testNames
         }
-        console.log(JSON.stringify(metadata))
     }
 
     /**
