@@ -112,6 +112,26 @@ export default class TestRunner {
     }
 
     /**
+     * Produce serializable metadata listing the tests and their test options,
+     * tags, etc.
+     *
+     * @param {RegExp} filter
+     * @returns {TestsMeta}
+     */
+    getTestsMeta(filter) {
+        const tests = this.getTests(filter, { logSkippedTests: false });
+        const testNames = tests.map(test => test.name);
+        const metadataByName =
+            tests.map(test => ({...test, filename: options.getFilename(test)}))
+                 .map(({name, testOpts, suite, filename}) => ({name, testOpts, suite, filename}))
+                 .reduce((obj, test) => (obj[test.name] = test, obj), {});
+        return {
+            "byTestName": metadataByName,
+            "order": testNames
+        }
+    }
+
+    /**
      * @param {RegExp} filter
      */
     async listTestFilenames(filter) {
@@ -262,4 +282,18 @@ function _outputErrorStack(error) {
 /**
  * @typedef {object} ShouldRunTestOptions
  * @property {boolean} [logSkippedTests]
+ */
+
+/**
+ * @typedef {object} SingleTestMeta
+ * @property {string} name
+ * @property {import('./specs.js').TestOptions} testOpts
+ * @property {string} suite
+ * @property {string} [filename]
+ */
+
+/**
+ * @typedef {object} TestsMeta
+ * @property {Array<string>} order
+ * @property {Object.<string, SingleTestMeta>} byTestName
  */

@@ -71,4 +71,5 @@ export type Test = {
 export type TestOptions = {
     testFilename?: string | ((testName: string) => string);
     shouldRunTest?: boolean | string | (() => boolean | string);
+    tags?: Array<string>;
 };

@@ -24,6 +24,14 @@ export default class TestRunner {
      */
     listTests(filter: RegExp): void;
     /**
+     * Produce serializable metadata listing the tests and their test options,
+     * tags, etc.
+     *
+     * @param {RegExp} filter
+     * @returns {TestsMeta}
+     */
+    getTestsMeta(filter: RegExp): TestsMeta;
+    /**
      * @param {RegExp} filter
      */
     listTestFilenames(filter: RegExp): Promise<void>;
@@ -53,6 +61,18 @@ export type TestResult = {
 };
 export type ShouldRunTestOptions = {
     logSkippedTests?: boolean;
+};
+export type SingleTestMeta = {
+    name: string;
+    testOpts: import("./specs.js").TestOptions;
+    suite: string;
+    filename?: string;
+};
+export type TestsMeta = {
+    order: Array<string>;
+    byTestName: {
+        [x: string]: SingleTestMeta;
+    };
 };
 declare namespace options {
     let tmpdir: any;

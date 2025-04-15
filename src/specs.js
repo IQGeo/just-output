@@ -177,6 +177,7 @@ function _stringify(obj, indentLvl) {
  * @typedef {object} TestOptions
  * @property {string | ((testName: string) => string)} [testFilename]
  * @property {boolean | string | (() => boolean | string)} [shouldRunTest]
+ * @property {Array<string>} [tags]
  */
 
 //these functions will be exposed as globals
