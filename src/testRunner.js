@@ -116,6 +116,7 @@ export default class TestRunner {
      * tags, etc.
      *
      * @param {RegExp} filter
+     * @returns {TestsMeta}
      */
     getTestsMeta(filter) {
         const tests = this.getTests(filter, { logSkippedTests: false });
@@ -281,4 +282,18 @@ function _outputErrorStack(error) {
 /**
  * @typedef {object} ShouldRunTestOptions
  * @property {boolean} [logSkippedTests]
+ */
+
+/**
+ * @typedef {object} SingleTestMeta
+ * @property {string} name
+ * @property {import('./specs.js').TestOptions} testOpts
+ * @property {string} suite
+ * @property {string} [filename]
+ */
+
+/**
+ * @typedef {object} TestsMeta
+ * @property {Array<string>} order
+ * @property {Object.<string, SingleTestMeta>} by_test_name
  */
