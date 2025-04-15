@@ -24,12 +24,13 @@ export default class TestRunner {
      */
     listTests(filter: RegExp): void;
     /**
-     * Show JSON-formatted metadata listing the tests and their test options,
+     * Produce serializable metadata listing the tests and their test options,
      * tags, etc.
      *
      * @param {RegExp} filter
+     * @returns {TestsMeta}
      */
-    testsMeta(filter: RegExp): void;
+    getTestsMeta(filter: RegExp): TestsMeta;
     /**
      * @param {RegExp} filter
      */
@@ -60,6 +61,18 @@ export type TestResult = {
 };
 export type ShouldRunTestOptions = {
     logSkippedTests?: boolean;
+};
+export type SingleTestMeta = {
+    name: string;
+    testOpts: import("./specs.js").TestOptions;
+    suite: string;
+    filename?: string;
+};
+export type TestsMeta = {
+    order: Array<string>;
+    by_test_name: {
+        [x: string]: SingleTestMeta;
+    };
 };
 declare namespace options {
     let tmpdir: any;
